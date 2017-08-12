@@ -1,5 +1,6 @@
 module.exports = {
   // bundle all modules in index.js to /public/bundle.js
+  // entry: './src/index.js',
   entry: './src/index.js',
   output: {
     path: __dirname + '/public',

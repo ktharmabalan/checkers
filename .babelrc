@@ -1,0 +1,5 @@
+// babel configurations
+{
+    // use presets to transform jsx and use modern JS
+    "presets": ["react", "es2015", "stage-2"]
+}
