@@ -2,8 +2,8 @@ import React from 'react';
 import {Group, Rect} from 'react-konva';
 
 class Tile extends React.Component {
-  constructor(...args) {
-    super(...args);
+  constructor(...props) {
+    super(...props);
   }
 
   render() {

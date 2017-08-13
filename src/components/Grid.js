@@ -6,8 +6,8 @@ class Grid extends React.Component {
     color: 'grey'
   };
 
-  constructor(...args) {
-    super(...args);
+  constructor(...props) {
+    super(...props);
   }
 
   render() {
