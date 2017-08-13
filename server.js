@@ -6,14 +6,14 @@ const server = express();
 
 server.set('view engine', 'ejs');
 
-server.get('/', (req, res) => {
-  res.render('index');
-});
-
 // serve api urls
 server.use('/api', apiRouter);
 // serve static files
 server.use(express.static('public'));
+
+server.get('*', (req, res) => {
+  res.render('index');
+});
 
 // listen to requests
 server.listen(config.port, config.host, () => {

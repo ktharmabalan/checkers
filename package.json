@@ -12,10 +12,13 @@
   "dependencies": {
     "ejs": "^2.5.7",
     "express": "^4.15.4",
+    "konva": "^1.6.7",
     "mongodb": "^2.2.31",
     "mongoose": "^4.11.6",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-dom": "^15.6.1",
+    "react-konva": "^1.1.4",
+    "react-router-dom": "^4.1.2"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
