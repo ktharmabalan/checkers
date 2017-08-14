@@ -1,1 +1,1 @@
-# chessapp
+# Checkers App
