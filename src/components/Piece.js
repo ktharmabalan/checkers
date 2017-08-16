@@ -10,38 +10,62 @@ class Piece extends React.Component {
   }
 
   handleClick = (event) => {
-    console.log('clicked');
+    this.props.onClick(this.props.coords, 'piece');
   }
+
+  mouseEnterHandler = (event) => {
+    // this.setState(prevState => ({
+    //   ...this.state,
+    //   hover: !prevState.hover
+    // }));
+
+    // console.log(this.props.coords);
+    // console.log('hover Piece');
+
+    // this.props.onClick(this.props.coords);
+
+    // let x = event.target.attrs.x;
+    // let y = event.target.attrs.y;
+    // let xRemainder = x % this.props.unit;
+    // let yRemainder = y % this.props.unit;
+
+    // let row = (x - xRemainder) / this.props.unit;
+    // let col = (y - yRemainder) / this.props.unit;
+    
+    // console.log(row, col);
+    // console.log(event.target.attrs.x, event.target.attrs.y);
+  };
 
   handleDrag = (event) => {
     let unit = this.state.unit;
     // get new position of dragged element 
     let attrs = event.target.attrs;
+    let x = attrs.x;
+    let y = attrs.y;
+
     if (attrs.x < 0) {
-      this.setState({
-        ...this.state,
-        position: [-(unit/2), event.target.attrs.y - unit/2]
-      });
+      x = -(unit/2);
+      y = event.target.attrs.y - unit/2;
     }
     if (attrs.x > (8 * unit)) {
-      this.setState({
-        ...this.state,
-        position: [(8 * unit)-(unit/2), event.target.attrs.y - unit/2]
-      });
+      x = (8 * unit)-(unit/2);
+      y = event.target.attrs.y - unit/2;
     }
     if (attrs.y < 0) {
-      this.setState({
-        ...this.state,
-        position: [event.target.attrs.x - unit/2, -(unit/2)]
-      });
+      x = event.target.attrs.x - unit/2;
+      y = -(unit/2);
     }
     if (attrs.y > (8 * unit)) {
-      this.setState({
-        ...this.state,
-        position: [event.target.attrs.x - unit/2, (8 * unit)-(unit/2)]
-      });
+      x = event.target.attrs.x - unit/2;
+      y = (8 * unit)-(unit/2);
     }
+    this.setState({
+      ...this.state,
+      position: [x, y]
+    });
   } 
+  // draggable={true}
+  // onDragMove={this.handleDrag}
 
   render() {
     let {
@@ -64,9 +88,8 @@ class Piece extends React.Component {
         index={index}
         id={index}
         coords={coords}
-        draggable={true}
-        onDragMove={this.handleDrag}
         onClick={this.handleClick}
+        onMouseEnter={this.mouseEnterHandler}
       />
     );
   }

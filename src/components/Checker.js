@@ -1,17 +1,77 @@
 import React from 'react';
 import { Stage, Layer } from 'react-konva';
-import Tile from './Tile';
-import Piece from './Piece';
+import TilesList from './TilesList';
+import PiecesList from './PieceList';
 
 class Checker extends React.Component {
   state = {
     rows: 8,
-    rowsvisible: 3
+    rowsVisible: 3,
+    hoveredTile: 5 + '_' + 3,
+    selectedPiece: null
   }
 
   constructor(props) {
     super(props);
   }
+
+  // hoverTile = () => {
+  //   this.setState({
+  //     ...this.state,
+  //     hoveredTile: [5,5]
+  //   });
+  // }
+
+  updateTile = (data, type) => {
+    let tempTilemap = this.state.tilesMap;
+    let tempPieceMap = this.state.piecesMap;
+    let hoveredTile = null;
+    let temp = null;
+    let selectedPiece = null;
+    let key = data[0] + '_' + data[1];
+
+    if (this.state.hoveredTile) {
+      temp = this.state.tilesMap[this.state.hoveredTile];
+      temp['hover'] = false;
+      tempTilemap[this.state.hoveredTile] = temp;
+    }
+    
+    if (this.state.hoveredTile !== (key)) {
+      hoveredTile = key;
+      temp = this.state.tilesMap[key];
+      temp['hover'] = true;
+      tempTilemap[key] = temp;
+    }
+
+    if (type === 'piece') {
+      selectedPiece = key;
+    } else {
+      if (this.state.selectedPiece !== null && this.state.selectedPiece !== key) {
+        temp = tempPieceMap[this.state.selectedPiece];
+        let coords = key.split('_');
+        coords[0] = parseInt(coords[0], 10);
+        coords[1] = parseInt(coords[1], 10);
+        let selectedCoords = [temp.x, temp.y];
+
+        if (((selectedCoords[0] + 1) === coords[0] && (selectedCoords[1] + 1) === coords[1]) || ((selectedCoords[0] - 1) === coords[0] && (selectedCoords[1] - 1) === coords[1]) ||
+          ((selectedCoords[0] + 1) === coords[0] && (selectedCoords[1] - 1) === coords[1]) || ((selectedCoords[0] - 1) === coords[0] && (selectedCoords[1] + 1) === coords[1])) {
+          temp['x'] = coords[0];
+          temp['y'] = coords[1];
+  
+          delete tempPieceMap[this.state.selectedPiece];
+          tempPieceMap[key] = temp;
+        }
+      }
+    }
+    
+    this.setState({
+      ...this.state,
+      tilesMap: tempTilemap,
+      piecesMap: tempPieceMap,
+      hoveredTile: hoveredTile,
+      selectedPiece
+    });
+  };
 
   componentWillMount() {
     let height = window.innerHeight;
@@ -22,108 +82,89 @@ class Checker extends React.Component {
     let unit = size / rows;
     unit = Math.floor(unit);
     size = unit * rows;
-    // let coordinates = [];
-    // let colors = [];
-    // let piecegroups = [];
-    let pieces = [];
-    let tiles = [];
-    let tileMap = {};
-
-    console.log(size, unit);
     
     let tileColorChoices = ['grey', 'white'];
     let pieceColorChoices = ['red', 'blue', 'black'];
 
+    let tileColor = tileColorChoices[0];
     let color = pieceColorChoices[0];
-
+    
     let i = 0;
+    let piece = false;
 
+    let piecesMap = {};
+    let tilesMap = {};
+
+    // cols
     for (let y = 0; y < rows; y++) {
+      // rows
       for (let x = 0; x < rows; x++) {
-        // coordinates.push([x*unit, y*unit]);
-        // colors.push(i % 2 === 0 ? tileColorChoices[0] : tileColorChoices[1]);
+        piece = false;
         i++;
-        
-        // Tiles
-        tiles.push(
-          <Tile 
-            unit={unit}
-            position={[x*unit, y*unit]}
-            color={i % 2 === 0 ? tileColorChoices[0] : tileColorChoices[1]}
-            key={(y*rows) + x + '_tile'}
-            index={(y*rows) + x + '_tile'}
-            opacity={1}
-            coords={[x,y]}
-          />
-        );
-
-        // tileMap[] = (y*rows) + x + '_tile';
 
         // Pieces
-        if((y < this.state.rowsvisible) || (y >= (rows - this.state.rowsvisible))) {
-          if(y < this.state.rowsvisible) {
+        if((y < this.state.rowsVisible) || (y >= (rows - this.state.rowsVisible))) {
+          if(y < this.state.rowsVisible) {
             color = pieceColorChoices[0];
-          } else if(y >= (rows - this.state.rowsvisible)) {
+          } else if(y >= (rows - this.state.rowsVisible)) {
             color = pieceColorChoices[1];
           }
           
           if ((y+1) % 2 !== 0) {
             if ((x+1) % 2 === 0) {
-              // piecegroups.push([x*unit, y*unit]);
-              pieces.push(<Piece 
-                key={(y*rows) + x}
-                index={(y*rows) + x}
-                position={[x*unit, y*unit]}
-                unit={unit}
-                color={color}
-                coords={[x,y]}
-              />);
+              piece = true;
             }
           } else {
             if ((x+1) % 2 !== 0) {
-              // piecegroups.push([x*unit, y*unit]);
-              pieces.push(<Piece 
-                key={(y*rows) + x}
-                index={(y*rows) + x}
-                position={[x*unit, y*unit]}
-                unit={unit}
-                color={color}
-                coords={[x,y]}
-              />);
+              piece = true;
             }
           }
+        }
+
+        if (piece) {
+          piecesMap[x+'_'+y] = {
+            x,
+            y,
+            color
+          };
+        }
+
+        tileColor = i % 2 === 0 ? tileColorChoices[0] : tileColorChoices[1];
+
+        // Tiles
+        tilesMap[x+'_'+y] = {
+          x,
+          y,
+          color: tileColor,
+          hover: false
+        };
+
+        if(x+'_'+y ===this.state.hoveredTile) {
+          tilesMap[x+'_'+y]['hover'] = true;
         }
       }
       i++;
     }
 
     this.setState({
+      ...this.state,
       size,
-      // rows,
-      // unit,
-      // coordinates,
-      // colors,
-      // piecegroups,
-      pieces,
-      tiles
+      rows,
+      unit,
+      tileColorChoices,
+      pieceColorChoices,
+      tilesMap,
+      piecesMap
     });
   }
-
+  
   render() {
-    let {
-      size,
-      // unit,
-      // rows,
-      tiles,
-      pieces
-    } = this.state;
-    
     return (
       <div className="Checker">
-        <Stage width={size} height={size} className='test'>
+        <Stage width={this.state.size} height={this.state.size} className='test'>
           <Layer>
-            {tiles}
-            {pieces}
+            <TilesList tiles={this.state.tilesMap} size={this.state.size} rows={this.state.rows} unit={this.state.unit} updateTile={this.updateTile} />
+            <PiecesList pieces={this.state.piecesMap} size={this.state.size} rows={this.state.rows} unit={this.state.unit} updateTile={this.updateTile} />
           </Layer>
         </Stage>
       </div>
